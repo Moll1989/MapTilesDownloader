@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
-from urllib.parse import parse_qsl
-import urllib.request
+import requests
 import cgi
 import uuid
 import random
@@ -123,17 +120,10 @@ class Utils:
 		# DONT use it in a prod/sensitive environment
 		ssl._create_default_https_context = ssl._create_unverified_context
 
-		try:
-			path, response = urllib.request.urlretrieve(url, destination)
-			code = 200
-		except urllib.error.URLError as e:
-			if not hasattr(e, "code"):
-				print(e)
-				code = -1
-			else:
-				code = e.code
-
-		return code
+		response = requests.get(url,headers={"User-Agent":"MapTilesDownloader"})
+		with open(destination,"wb") as f:
+			f.write(response.content)
+		return response.status_code
 
 
 	@staticmethod
